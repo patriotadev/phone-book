@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import styled from '@emotion/styled';
+import ContactList from './pages/ContactList';
+// import { useQuery, gql } from "@apollo/client";
+import { Routes, Route } from 'react-router-dom';
+import ContactDetail from './pages/ContactDetail';
+import FormContact from './pages/FormContact';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Wrapper className="App">
+      <Routes>
+        <Route path='/' element={<ContactList/>} />
+        <Route path={'/:id'} element={<ContactDetail/>}/>
+        <Route path={'/add'} element={<FormContact/>}/>
+      </Routes>
+    </Wrapper>
   );
 }
+
+const Wrapper = styled.div`
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // background-color: #e0e0e0;
+  background-image: linear-gradient(to right, #003973, #e5e5be);
+  overflow: hidden;
+`;
+
 
 export default App;

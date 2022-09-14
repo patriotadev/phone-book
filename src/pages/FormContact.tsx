@@ -3,11 +3,12 @@ import { useMutation, useQuery} from '@apollo/client';
 import { ADD_CONTACT, GET_CONTACT } from '../hooks/useContact';
 import { FaUser } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
-import { AiOutlineMinusCircle, AiOutlineUserAdd } from 'react-icons/ai';
-import { MdOutlineAddCircleOutline } from 'react-icons/md';
+import { AiOutlineUserAdd } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../components/Loading';
+import ErrorAlert from '../components/ErrorAlert';
 
 
 function FormContact() {
@@ -23,26 +24,21 @@ function FormContact() {
 
   const [numberRow, setNumberRow] = useState([
     <InputGroup>
-        <BsFillTelephoneForwardFill style={{marginTop: '12px'}} size={20}/>
+        <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
         <NumberInput ref={numberRef} name='phone' onChange={(e) => setNumbers([...numbers, {number: e.target.value}])} placeholder='+628XXXXXXXXXX' type='text' />
     </InputGroup>
   ] as any);
 
   const addNumberRow = () => {
     setNumberRow([...numberRow, <InputGroup>
-        <BsFillTelephoneForwardFill style={{marginTop: '12px'}} size={20}/>
+        <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
         <NumberInput name='phone' onChange={(e) => setNumbers([...numbers, {number: e.target.value}])} placeholder='+628XXXXXXXXXX' type='text' />
     </InputGroup>])
   }
 
-  const removeNumberRow = () => {
-    const temp = [...numberRow];
-    const dataNumber = temp.splice(numberRow.length - 1, 1);
-    setNumberRow(dataNumber);
-    setNumbers([]);
-  }
+  console.log(numbers)
 
-  const submitHandler = () => {
+  const submitHandler = async () => {
     let unique = false;
     // eslint-disable-next-line array-callback-return
     data.contact.filter((contact:any) => {
@@ -55,7 +51,7 @@ function FormContact() {
     if (unique) {
         navigate('/add')
     } else {
-        setPhones(numbers);
+        await setPhones(numbers);
         insert_contact();
         alert('Success! contact has been added.')
         navigate('/');
@@ -70,9 +66,8 @@ function FormContact() {
     }, refetchQueries: [{query: GET_CONTACT}]
   })
 
-  if(error) return <div>Error...</div>
-  if(loading) return <div>Loading...</div>
-  console.log(phones);
+  if(error) return <ErrorAlert/>
+  if(loading) return <Loading/>
 
   return (
     <Wrapper>
@@ -81,18 +76,16 @@ function FormContact() {
                 <BackBtn>&#8249; Back</BackBtn>
             </Link>
             <Action>
-                {/* <AiOutlineMinusCircle size={20} color='red'/>
-                <h4 style={{color: 'red', cursor: 'pointer'}}>Delete</h4> */}
             </Action>
         </Nav>
         <Header>
             <Profile>
-                <AiOutlineUserAdd size={150}/>
+                <AiOutlineUserAdd color='#404040' size={150}/>
             </Profile>
         </Header>
             <NameInputField>
                 <InputGroup>
-                    <FaUser style={{marginTop: '12px'}} size={20}/>
+                    <FaUser color='#404040' style={{marginTop: '12px'}} size={20}/>
                     <NameInput name='first_name' value={firstName} onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='First Name' type='text' />
                     <NameInput name='last_name' value={lastName} onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='Last Name' type='text' />
                 </InputGroup>
@@ -101,8 +94,7 @@ function FormContact() {
                 {numberRow}
             </NumberInputField>
             <NumberInputAction>
-                <MdOutlineAddCircleOutline onClick={addNumberRow} color='green' style={{marginRight: '1.5%', cursor: 'pointer'}}/>
-                <AiOutlineMinusCircle onClick={removeNumberRow} color='red' style={{cursor: 'pointer'}}/>
+                <AddNumberBtn onClick={addNumberRow}>+ Add More</AddNumberBtn>
             </NumberInputAction>
             <Save>
                 <SaveBtn onClick={submitHandler}>Save</SaveBtn>
@@ -119,6 +111,21 @@ const Wrapper = styled.div`
     padding: 2rem;
     border-radius: 0.5rem;
     font-family: sans-serif;
+
+    @media (max-width: 1000px) {
+        width: 70%;
+    }
+
+    @media (max-width: 567px) {
+        margin: 4% 0%;
+        width: 80%;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 400px) {
+        width: 90%;
+    }
 `;
 
 const BackBtn = styled.h4`
@@ -129,6 +136,16 @@ const BackBtn = styled.h4`
         transform: translateY(-4px);
     }
 `;
+
+const AddNumberBtn = styled.h4`
+    color: lightgrey;
+    cursor: pointer;
+
+    &:hover {
+        color: #404040;
+    }
+
+`
 
 const Nav = styled.div`
     color: #0865c2;
@@ -244,7 +261,7 @@ const SaveBtn = styled.button`
     border-radius: 5px;
     border: none;
     font-weight: bold;
-    background-color: black;
+    background-color: #404040;
     color: white;
     cursor: pointer;
 `

@@ -1,8 +1,10 @@
 import styled from '@emotion/styled';
-import { FaRegStar } from 'react-icons/fa'
-import { BsThreeDotsVertical } from 'react-icons/bs'
+import { FaRegStar, FaAngleRight, FaStar } from 'react-icons/fa'
 
 function Contact(contact: any) {
+
+  const favouriteContactIdList = JSON.parse(localStorage.getItem('favourites') || '{}');
+
   return (
     <Card>
         <ContactName className='contact-info'>
@@ -10,11 +12,11 @@ function Contact(contact: any) {
         </ContactName>
         <Action>
             <Favourite>
-              <FaRegStar/>
+              { favouriteContactIdList.includes(contact.id) ? <FaStar color='#404040'/>  : <FaRegStar/>}
             </Favourite>
-            <DotAction>
-              <BsThreeDotsVertical/>
-            </DotAction>
+            <Detail>
+              <FaAngleRight color='#404040' />
+            </Detail>
         </Action>
     </Card>
   )
@@ -41,6 +43,7 @@ const Card = styled.div`
 
 const ContactName = styled.div`
     margin-left: 1rem;
+    color: #404040;
 `
 
 
@@ -58,7 +61,7 @@ const Favourite = styled.div`
     // background-color: salmon;
 `;
 
-const DotAction = styled.div`
+const Detail = styled.div`
     display: flex;
     align-items: center;
     padding: 1rem;

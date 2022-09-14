@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { FaUser, FaRegStar, FaStar } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../components/Loading';
+import ErrorAlert from '../components/ErrorAlert';
 
   const ContactDetail = () => {
  
@@ -105,8 +107,8 @@ import { useNavigate } from 'react-router-dom';
 
     }
 
-  if(error) return <div>Something Error</div>
-  if(loading) return <div>Loading...</div>
+  if(error) return <ErrorAlert/>
+  if(loading) return <Loading/>
 
   return (
     <Wrapper>
@@ -125,9 +127,9 @@ import { useNavigate } from 'react-router-dom';
                 }
             } }>
                 {
-                    favourite.includes(data.contact_by_pk.id) ? <FaStar size={20} color="black" /> :  <FaRegStar size={20} color='black'/>
+                    favourite.includes(data.contact_by_pk.id) ? <FaStar size={20} color='#404040' /> :  <FaRegStar size={20} color='#404040'/>
                 }
-                <h4 style={{color: 'black', cursor: 'pointer', marginLeft: '0.5rem'}}>Favourite</h4>
+                <FavouriteText>Favourite</FavouriteText>
             </Favourite>
             <Remove onClick={() => {
                 delete_contact_by_pk({variables: {id: data.contact_by_pk.id}})
@@ -136,26 +138,26 @@ import { useNavigate } from 'react-router-dom';
             }
             }>
                 <AiOutlineMinusCircle size={20} color='red'/>
-                <h4 style={{color: 'red', cursor: 'pointer', marginLeft: '0.5rem'}}>Delete</h4>
+                <RemoveText style={{color: 'red', cursor: 'pointer', marginLeft: '0.5rem'}}>Delete</RemoveText>
             </Remove>
             </Action>
         </Nav>
         <Header>
              <Profile>
-                <FaUserCircle size={150}/>
+                <FaUserCircle color='#404040' size={150}/>
                 {/* <h1>{data.contact_by_pk["first_name"]} {data.contact_by_pk["last_name"]}</h1> */}
             </Profile>
         </Header>
             <NameInputField>
                 <InputGroup>
-                    <FaUser style={{marginTop: '12px'}} size={20}/>
+                    <FaUser color='#404040' style={{marginTop: '12px'}} size={20}/>
                     <NameInput name='first_name' value={firstName === null ? data.contact_by_pk["first_name"] : firstName} onChange={(e: { target: { value: any; }; }) => setFirstName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='First Name' type='text' />
                     <NameInput name='last_name' value={lastName === null ? data.contact_by_pk["last_name"] : lastName} onChange={(e: { target: { value: any; }; }) => setLastName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='Last Name' type='text' />
                 </InputGroup>
             </NameInputField>
             <NumberInputField>
                 {data.contact_by_pk.phones.map((phone:any) => <NumberField>
-                    <BsFillTelephoneForwardFill style={{marginTop: '12px'}} size={20}/>
+                    <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
                     <NumberInput placeholder='+628XXXXXXXXXX' type='text' value={phone.number} />
                     </NumberField>)}
             </NumberInputField>
@@ -174,6 +176,21 @@ const Wrapper = styled.div`
     padding: 2rem;
     border-radius: 0.5rem;
     font-family: sans-serif;
+
+    @media (max-width: 1000px) {
+        width: 70%;
+    }
+
+    @media (max-width: 567px) {
+        margin: 4% 0%;
+        width: 80%;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    @media (max-width: 400px) {
+        width: 90%;
+    }
 `;
 
 const BackBtn = styled.h4`
@@ -182,6 +199,25 @@ const BackBtn = styled.h4`
     &:hover {
         cursor: pointer;
         transform: translateY(-4px);
+    }
+`;
+
+const FavouriteText = styled.h4`
+    color: #404040;
+    cursor: pointer;
+    margin-left: 0.5rem;
+
+    @media(max-width: 1350px) {
+        display: none;
+    }
+`;
+const RemoveText = styled.h4`
+    color: #404040;
+    cursor: pointer;
+    margin-left: 0.5rem;
+
+    @media(max-width: 1350px) {
+        display: none;
     }
 `;
 
@@ -243,7 +279,11 @@ const Action = styled.div`
     justify-content: space-around;
     width: 30%;
     align-items: center;
-`
+
+    @media(max-width: 1350px) {
+        width: 6rem;
+    }
+`;
 
 const Favourite = styled.div`
     display: flex;
@@ -321,7 +361,7 @@ const SaveBtn = styled.button`
     border-radius: 5px;
     border: none;
     font-weight: bold;
-    background-color: black;
+    background-color: #404040;
     color: white;
 `
 

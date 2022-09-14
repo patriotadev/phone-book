@@ -3,11 +3,12 @@ import { FilterType } from '../pages/ContactList';
 // import { FaFilter } from 'react-icons/fa';
 
 function Filter({filter, setFilter} : FilterType) {
+  
   return (
-    <Select>
-        <option value='1'>All</option>
-        <option value='2'>Favourite</option>
-        <option value='3'>Regular</option>
+    <Select onChange={(e) => setFilter(e.target.value)}>
+        <option value='All'>All</option>
+        <option value='Favourite'>Favourite</option>
+        <option value='Regular'>Regular</option>
     </Select>
   )
 }

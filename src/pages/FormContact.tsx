@@ -44,6 +44,7 @@ function FormContact() {
 
   const submitHandler = () => {
     let unique = false;
+    // eslint-disable-next-line array-callback-return
     data.contact.filter((contact:any) => {
         if (contact.first_name.toLowerCase() === firstName.toLowerCase() && contact.last_name.toLowerCase() === lastName.toLowerCase()) {
             unique = true;
@@ -77,7 +78,7 @@ function FormContact() {
     <Wrapper>
         <Nav>
             <Link to={'/'} style={{textDecoration: 'none', color: '#0865c2'}}>
-                <h4>&#8249; Back</h4>
+                <BackBtn>&#8249; Back</BackBtn>
             </Link>
             <Action>
                 {/* <AiOutlineMinusCircle size={20} color='red'/>
@@ -87,7 +88,6 @@ function FormContact() {
         <Header>
             <Profile>
                 <AiOutlineUserAdd size={150}/>
-                {/* <NameInput style={{textAlign: 'center'}} type='text' placeholder='Contact Name' /> */}
             </Profile>
         </Header>
             <NameInputField>
@@ -119,6 +119,15 @@ const Wrapper = styled.div`
     padding: 2rem;
     border-radius: 0.5rem;
     font-family: sans-serif;
+`;
+
+const BackBtn = styled.h4`
+    transition: 0.3s ease;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-4px);
+    }
 `;
 
 const Nav = styled.div`

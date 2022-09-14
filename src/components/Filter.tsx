@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
+import { FilterType } from '../pages/ContactList';
 // import { FaFilter } from 'react-icons/fa';
 
-function Filter() {
+function Filter({filter, setFilter} : FilterType) {
   return (
     <Select>
         <option value='1'>All</option>

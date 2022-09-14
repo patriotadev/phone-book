@@ -8,17 +8,22 @@ import styled from '@emotion/styled';
 import { useState } from 'react';
 import Logo from '../assets/images/phonebook.png';
 
-
 export type SearchType = {
     search: string
     setSearch: React.Dispatch<React.SetStateAction<string>>
 }
 
+export type FilterType = {
+    filter: number
+    setFilter: React.Dispatch<React.SetStateAction<number>>
+}
+
+
 function ContactList() {
 
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
-//   const [filter, setFilter] = useState(1);
+  const [filter, setFilter] = useState(1);
   const {error, loading, data} = useQuery(GET_CONTACT);
   if(error) return <div>Oops.. Something Wrong!</div>
   if(loading) return <div>Loading..</div>
@@ -26,6 +31,29 @@ function ContactList() {
   const totalPage = Math.ceil(data.contact.length / 10);
   const firstIndex = (page * 10) - 10;
   const lastIndex = page * 10;
+
+  const favouriteContactIdList = JSON.parse(localStorage.getItem('favourites') || '{}');
+  console.log(favouriteContactIdList)
+
+  // eslint-disable-next-line array-callback-return
+  const allContact = data.contact.filter((contact: any) => {
+    if(search === "") return contact
+    if(contact.first_name.toLowerCase().includes(search.toLowerCase()) || contact.last_name.toLowerCase().includes(search.toLowerCase())) return contact
+  }).slice(firstIndex, lastIndex).map((contact: any) => <Link style={{textDecoration: 'none'}} to={`/${contact.id}`}><Contact {...contact} /></Link>)
+
+  const favouriteContact = data.contact.filter((contact: any) => {
+    if(search === "") return contact
+    if(contact.first_name.toLowerCase().includes(search.toLowerCase()) || contact.last_name.toLowerCase().includes(search.toLowerCase())) return contact
+  }).filter((contact: any) => {
+    if(favouriteContactIdList.includes(contact.id)) return contact
+  }).slice(firstIndex, lastIndex).map((contact: any) => <Link style={{textDecoration: 'none'}} to={`/${contact.id}`}><Contact {...contact} /></Link>)
+  
+  const regularContact = data.contact.filter((contact: any) => {
+    if(search === "") return contact
+    if(contact.first_name.toLowerCase().includes(search.toLowerCase()) || contact.last_name.toLowerCase().includes(search.toLowerCase())) return contact
+  }).filter((contact: any) => {
+    if(!favouriteContactIdList.includes(contact.id)) return contact
+  }).slice(firstIndex, lastIndex).map((contact: any) => <Link style={{textDecoration: 'none'}} to={`/${contact.id}`}><Contact {...contact} /></Link>)
 
   return (
     <Wrapper>
@@ -36,21 +64,19 @@ function ContactList() {
                   <img src={Logo} alt='logo' width={60} /><h1 style={{marginLeft: '0.5rem', color: '#404040'}}>PhoneBook</h1>
                 </Title>
                 <Link style={{textDecoration: 'none', color: 'black'}} to={'/add'}>
-                  <h3 style={{color: '#0865c2'}}>+ Add New</h3>
+                  <AddBtn style={{color: '#0865c2'}}>+ Add New</AddBtn>
                 </Link>
             </HeadTitle>
             <InputField>
               <SearchBar search={search} setSearch={setSearch} />  
-              <Filter/>       
+              <Filter filter={filter} setFilter={setFilter}/>       
             </InputField>
         </Header>
         <List>
         {
-            // eslint-disable-next-line array-callback-return
-            data.contact.filter((contact: any) => {
-                if(search === "") return contact
-                if(contact.first_name.toLowerCase().includes(search.toLowerCase()) || contact.last_name.toLowerCase().includes(search.toLowerCase())) return contact
-            }).slice(firstIndex, lastIndex).map((contact: any) => <Link style={{textDecoration: 'none'}} to={`/${contact.id}`}><Contact {...contact} /></Link>)
+            allContact
+            // favouriteContact
+            // regularContact
         }
         </List>
         <Paginate>
@@ -69,6 +95,15 @@ const Wrapper = styled.div`
     padding: 2rem;
     border-radius: 0.5rem;
     font-family: sans-serif;
+`;
+
+const AddBtn = styled.h3`
+    transition: 0.3s ease;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-4px);
+    }
 `;
 
 
@@ -103,7 +138,6 @@ const PageBtn = styled.button`
 const Title = styled.div`
     display: flex;
     align-items: center;
-    // font-family: 'Combo', cursive;
     font-family: 'Anton', sans-serif;
 `;
 

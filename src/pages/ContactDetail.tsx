@@ -6,18 +6,35 @@ import { FaUserCircle } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
 import { AiOutlineMinusCircle } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
-import { FaUser } from 'react-icons/fa';
-import { useState } from 'react';
+import { FaUser, FaRegStar, FaStar } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-  function ContactDetail() {
-
+  const ContactDetail = () => {
+ 
   const navigate = useNavigate();
   const { id } = useParams();
   const {error, loading, data} = useQuery(GET_CONTACT_DETAIL, {
       variables: {id},
   })
+  const [favourite, setFavourite] = useState(() => {
+    const storage = localStorage.getItem('favourites');
+    return storage ? JSON.parse(storage) : []
+  })
+  console.log(favourite);
 
+  useEffect(() => {
+    const favourites = JSON.parse(localStorage.getItem('favourites') || '{}');
+    if(favourites) {
+    setFavourite(favourites);
+    }
+  }, [])
+  
+  useEffect(() => {
+        localStorage.setItem('favourites', JSON.stringify(favourite));
+  },[favourite])
+
+  
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
 //   const [numbers, setNumbers] = useState([] as any);
@@ -31,10 +48,9 @@ import { useNavigate } from 'react-router-dom';
 
   const contacts = useQuery(GET_CONTACT);
 
-  console.log(contacts.data);
-
     const updateContactHandler =  () => {
         let unique = false;
+        // eslint-disable-next-line array-callback-return
         contacts.data.contact.filter((contact:any) => {
             if(firstName !== null && lastName !== null) {
                 if (contact.first_name === firstName && contact.last_name === lastName) {
@@ -96,16 +112,32 @@ import { useNavigate } from 'react-router-dom';
     <Wrapper>
         <Nav>
             <Link to={'/'} style={{textDecoration: 'none', color: '#0865c2'}}>
-                <h4>&#8249; Back</h4>
+                <BackBtn>&#8249; Back</BackBtn>
             </Link>
-            <Action onClick={() => {
+            <Action>
+            <Favourite onClick={() => {
+                let isFavourite = favourite.includes(data.contact_by_pk.id);
+                if(isFavourite) {
+                    setFavourite(favourite.filter((fav: any) => fav !== data.contact_by_pk.id));
+                } else {
+                    alert("Success! Contact has been added to favourite.")
+                    setFavourite([...favourite, data.contact_by_pk.id]);
+                }
+            } }>
+                {
+                    favourite.includes(data.contact_by_pk.id) ? <FaStar size={20} color="black" /> :  <FaRegStar size={20} color='black'/>
+                }
+                <h4 style={{color: 'black', cursor: 'pointer', marginLeft: '0.5rem'}}>Favourite</h4>
+            </Favourite>
+            <Remove onClick={() => {
                 delete_contact_by_pk({variables: {id: data.contact_by_pk.id}})
                 alert('Success! contact has been deleted.');
                 navigate('/');
             }
             }>
                 <AiOutlineMinusCircle size={20} color='red'/>
-                <h4 style={{color: 'red', cursor: 'pointer'}}>Delete</h4>
+                <h4 style={{color: 'red', cursor: 'pointer', marginLeft: '0.5rem'}}>Delete</h4>
+            </Remove>
             </Action>
         </Nav>
         <Header>
@@ -142,6 +174,15 @@ const Wrapper = styled.div`
     padding: 2rem;
     border-radius: 0.5rem;
     font-family: sans-serif;
+`;
+
+const BackBtn = styled.h4`
+    transition: 0.3s ease;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-4px);
+    }
 `;
 
 const NameInputField = styled.div`
@@ -200,9 +241,31 @@ const Nav = styled.div`
 const Action = styled.div`
     display: flex;
     justify-content: space-around;
-    width: 8%;
+    width: 30%;
     align-items: center;
 `
+
+const Favourite = styled.div`
+    display: flex;
+    align-items: center;
+    transition: 0.3s ease;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-4px);
+    }
+`;
+
+const Remove = styled.div`
+    display: flex;
+    align-items: center;
+    transition: 0.3s ease;
+
+    &:hover {
+        cursor: pointer;
+        transform: translateY(-4px);
+    }
+`;
 
 const Profile = styled.div`
     display: flex;

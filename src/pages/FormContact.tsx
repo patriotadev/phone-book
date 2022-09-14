@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useMutation} from '@apollo/client';
+import { useMutation, useQuery} from '@apollo/client';
 import { ADD_CONTACT, GET_CONTACT } from '../hooks/useContact';
 import { FaUser } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
@@ -12,8 +12,9 @@ import { useNavigate } from 'react-router-dom';
 
 function FormContact() {
 
-  const numberRef = useRef<HTMLInputElement | null>(null);
 
+  const {data} = useQuery(GET_CONTACT);
+  const numberRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -36,15 +37,28 @@ function FormContact() {
 
   const removeNumberRow = () => {
     const temp = [...numberRow];
-    const data = temp.splice(numberRow.length - 1, 1);
-    setNumberRow(data);
+    const dataNumber = temp.splice(numberRow.length - 1, 1);
+    setNumberRow(dataNumber);
     setNumbers([]);
   }
 
-  const submitHandler = async () => {
-    await setPhones(numbers);
-    insert_contact();
-    navigate('/');
+  const submitHandler = () => {
+    let unique = false;
+    data.contact.filter((contact:any) => {
+        if (contact.first_name.toLowerCase() === firstName.toLowerCase() && contact.last_name.toLowerCase() === lastName.toLowerCase()) {
+            unique = true;
+            alert("Contact name already exists, please enter another name.");
+        }
+    })
+
+    if (unique) {
+        navigate('/add')
+    } else {
+        setPhones(numbers);
+        insert_contact();
+        alert('Success! contact has been added.')
+        navigate('/');
+    }
   }
 
   const [insert_contact, {error, loading}] = useMutation(ADD_CONTACT, {
@@ -79,8 +93,8 @@ function FormContact() {
             <NameInputField>
                 <InputGroup>
                     <FaUser style={{marginTop: '12px'}} size={20}/>
-                    <NameInput name='first_name' value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder='First Name' type='text' />
-                    <NameInput name='last_name' value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder='Last Name' type='text' />
+                    <NameInput name='first_name' value={firstName} onChange={(e) => setFirstName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='First Name' type='text' />
+                    <NameInput name='last_name' value={lastName} onChange={(e) => setLastName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='Last Name' type='text' />
                 </InputGroup>
             </NameInputField>
             <NumberInputField>

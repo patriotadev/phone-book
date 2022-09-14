@@ -1,6 +1,6 @@
 import {useQuery, useMutation} from '@apollo/client';
 import { useParams } from "react-router-dom";
-import { GET_CONTACT_DETAIL, DELETE_CONTACT_BY_ID, GET_CONTACT, EDIT_CONTACT} from '../hooks/useContact';
+import { GET_CONTACT_DETAIL, DELETE_CONTACT_BY_ID, GET_CONTACT, EDIT_CONTACT, EDIT_PHONE_NUMBER} from '../hooks/useContact';
 import styled from '@emotion/styled';
 import { FaUserCircle } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
@@ -26,37 +26,67 @@ import { useNavigate } from 'react-router-dom';
     refetchQueries: [{query: GET_CONTACT}]
   });
   
-  const [update_contact_by_pk] = useMutation(EDIT_CONTACT)
-    
+  const [update_contact_by_pk] = useMutation(EDIT_CONTACT);
+  const [update_phone_by_pk] = useMutation(EDIT_PHONE_NUMBER);
+
+  const contacts = useQuery(GET_CONTACT);
+
+  console.log(contacts.data);
+
     const updateContactHandler =  () => {
-        // update_contact_by_pk();
-        if (firstName !== null && lastName !== null) {
-            update_contact_by_pk({variables: {
-                "id": id,
-                "_set": {
-                    "first_name": firstName,
-                    "last_name": lastName,
-                  }
-            }, refetchQueries: [{query: GET_CONTACT}]
-        })
-        } else if (data.contact_by_pk["first_name"] !== firstName && lastName === null) {
-            update_contact_by_pk({variables: {
-                "id": id,
-                "_set": {
-                    "first_name": firstName
+        let unique = false;
+        contacts.data.contact.filter((contact:any) => {
+            if(firstName !== null && lastName !== null) {
+                if (contact.first_name === firstName && contact.last_name === lastName) {
+                    unique = true;
+                    alert("Contact name already exists, please enter another name.");
                 }
-            }, refetchQueries: [{query: GET_CONTACT}]
-        })
-        } else if (firstName === null && data.contact_by_pk["first_name"] !== lastName) {
-            update_contact_by_pk({variables: {
-                "id": id,
-                "_set": {
-                    "last_name": lastName
+            } else if (firstName !== null && lastName === null) {
+                if (contact.first_name === firstName) {
+                    unique = true;
+                    alert("Contact name already exists, please enter another name.");
                 }
-            }, refetchQueries: [{query: GET_CONTACT}]
+            } else if (firstName === null && lastName !== null) {
+                if (contact.last_name === lastName) {
+                    unique = true;
+                    alert("Contact name already exists, please enter another name.");
+                }
+            }
         })
+
+        if(unique) {
+            navigate(`/${id}`)
+        } else {
+            if (firstName !== null && lastName !== null) {
+                update_contact_by_pk({variables: {
+                    "id": id,
+                    "_set": {
+                        "first_name": firstName,
+                        "last_name": lastName,
+                      }
+                }, refetchQueries: [{query: GET_CONTACT}]
+            })
+            } else if (data.contact_by_pk["first_name"] !== firstName && lastName === null) {
+                update_contact_by_pk({variables: {
+                    "id": id,
+                    "_set": {
+                        "first_name": firstName
+                    }
+                }, refetchQueries: [{query: GET_CONTACT}]
+            })
+            } else if (firstName === null && data.contact_by_pk["first_name"] !== lastName) {
+                update_contact_by_pk({variables: {
+                    "id": id,
+                    "_set": {
+                        "last_name": lastName
+                    }
+                }, refetchQueries: [{query: GET_CONTACT}]
+            })
+            }
+            alert('Success! contact has been updated.')
+            navigate('/');
         }
-        navigate('/');
+
     }
 
   if(error) return <div>Something Error</div>
@@ -68,7 +98,12 @@ import { useNavigate } from 'react-router-dom';
             <Link to={'/'} style={{textDecoration: 'none', color: '#0865c2'}}>
                 <h4>&#8249; Back</h4>
             </Link>
-            <Action onClick={() => delete_contact_by_pk({variables: {id: data.contact_by_pk.id}})}>
+            <Action onClick={() => {
+                delete_contact_by_pk({variables: {id: data.contact_by_pk.id}})
+                alert('Success! contact has been deleted.');
+                navigate('/');
+            }
+            }>
                 <AiOutlineMinusCircle size={20} color='red'/>
                 <h4 style={{color: 'red', cursor: 'pointer'}}>Delete</h4>
             </Action>
@@ -82,8 +117,8 @@ import { useNavigate } from 'react-router-dom';
             <NameInputField>
                 <InputGroup>
                     <FaUser style={{marginTop: '12px'}} size={20}/>
-                    <NameInput name='first_name' value={firstName === null ? data.contact_by_pk["first_name"] : firstName} onChange={(e: { target: { value: any; }; }) => setFirstName(e.target.value)} placeholder='First Name' type='text' />
-                    <NameInput name='last_name' value={lastName === null ? data.contact_by_pk["last_name"] : lastName} onChange={(e: { target: { value: any; }; }) => setLastName(e.target.value)} placeholder='Last Name' type='text' />
+                    <NameInput name='first_name' value={firstName === null ? data.contact_by_pk["first_name"] : firstName} onChange={(e: { target: { value: any; }; }) => setFirstName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='First Name' type='text' />
+                    <NameInput name='last_name' value={lastName === null ? data.contact_by_pk["last_name"] : lastName} onChange={(e: { target: { value: any; }; }) => setLastName(e.target.value.replace(/[^a-zA-Z0-9' ']/ig, ''))} placeholder='Last Name' type='text' />
                 </InputGroup>
             </NameInputField>
             <NumberInputField>

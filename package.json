@@ -1,6 +1,6 @@
 {
   "name": "phone-book",
-  "homepage": "https://patriotadev.github.io/phone-book",
+  "homepage": "http://patriotadev.github.io/phone-book",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

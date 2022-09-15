@@ -64,7 +64,6 @@ function ContactList() {
         <Header>
             <HeadTitle>
                 <Title>
-                  {/* <h1 style={{color: '#2e2d2d'}}><AiFillContacts color='#2e2d2d' size={20} style={{marginRight: '0.5rem'}} />phoneBook</h1> */}
                   <img src={Logo} alt='logo' width={60} /><h1 style={{marginLeft: '0.5rem', color: '#404040'}}>PhoneBook</h1>
                 </Title>
                 <Link style={{textDecoration: 'none', color: 'black'}} to={'/add'}>

@@ -1,6 +1,6 @@
 import {useQuery, useMutation} from '@apollo/client';
 import { useParams } from "react-router-dom";
-import { GET_CONTACT_DETAIL, DELETE_CONTACT_BY_ID, GET_CONTACT, EDIT_CONTACT, EDIT_PHONE_NUMBER} from '../hooks/useContact';
+import { GET_CONTACT_DETAIL, DELETE_CONTACT_BY_ID, GET_CONTACT, EDIT_CONTACT, EDIT_PHONE_NUMBER, ADD_NUMBER} from '../hooks/useContact';
 import styled from '@emotion/styled';
 import { FaUserCircle } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
@@ -39,18 +39,21 @@ import ErrorAlert from '../components/ErrorAlert';
   
   const [firstName, setFirstName] = useState(null);
   const [lastName, setLastName] = useState(null);
-//   const [numbers, setNumbers] = useState([] as any);
+  const [newNumber, setNewNumber] = useState('');
+  const [numberValue] = useState(null);
+
 
   const [delete_contact_by_pk] = useMutation(DELETE_CONTACT_BY_ID, {
     refetchQueries: [{query: GET_CONTACT}]
   });
   
+  const [insert_phone] = useMutation(ADD_NUMBER);
   const [update_contact_by_pk] = useMutation(EDIT_CONTACT);
   const [update_phone_by_pk] = useMutation(EDIT_PHONE_NUMBER);
 
   const contacts = useQuery(GET_CONTACT);
 
-    const updateContactHandler =  () => {
+    const updateContactHandler = () => {
         let unique = false;
         // eslint-disable-next-line array-callback-return
         contacts.data.contact.filter((contact:any) => {
@@ -76,7 +79,12 @@ import ErrorAlert from '../components/ErrorAlert';
             navigate(`/${id}`)
         } else {
             if (firstName !== null && lastName !== null) {
-                update_contact_by_pk({variables: {
+                 insert_phone({variables: {
+                    "contact_id": id,
+                    "phone_number": newNumber
+                }, refetchQueries: [{query: GET_CONTACT}]
+                })
+                 update_contact_by_pk({variables: {
                     "id": id,
                     "_set": {
                         "first_name": firstName,
@@ -85,7 +93,12 @@ import ErrorAlert from '../components/ErrorAlert';
                 }, refetchQueries: [{query: GET_CONTACT}]
             })
             } else if (data.contact_by_pk["first_name"] !== firstName && lastName === null) {
-                update_contact_by_pk({variables: {
+                 insert_phone({variables: {
+                    "contact_id": id,
+                    "phone_number": newNumber
+                }, refetchQueries: [{query: GET_CONTACT}]
+                })
+                 update_contact_by_pk({variables: {
                     "id": id,
                     "_set": {
                         "first_name": firstName
@@ -93,13 +106,24 @@ import ErrorAlert from '../components/ErrorAlert';
                 }, refetchQueries: [{query: GET_CONTACT}]
             })
             } else if (firstName === null && data.contact_by_pk["first_name"] !== lastName) {
-                update_contact_by_pk({variables: {
+                 insert_phone({variables: {
+                    "contact_id": id,
+                    "phone_number": newNumber
+                }, refetchQueries: [{query: GET_CONTACT}]
+                })
+                 update_contact_by_pk({variables: {
                     "id": id,
                     "_set": {
                         "last_name": lastName
                     }
                 }, refetchQueries: [{query: GET_CONTACT}]
             })
+            } else if (firstName === null && lastName === null) {
+                 insert_phone({variables: {
+                    "contact_id": id,
+                    "phone_number": newNumber
+                }, refetchQueries: [{query: GET_CONTACT}]
+                })
             }
             alert('Success! contact has been updated.')
             navigate('/');
@@ -145,7 +169,6 @@ import ErrorAlert from '../components/ErrorAlert';
         <Header>
              <Profile>
                 <FaUserCircle color='#404040' size={150}/>
-                {/* <h1>{data.contact_by_pk["first_name"]} {data.contact_by_pk["last_name"]}</h1> */}
             </Profile>
         </Header>
             <NameInputField>
@@ -158,8 +181,20 @@ import ErrorAlert from '../components/ErrorAlert';
             <NumberInputField>
                 {data.contact_by_pk.phones.map((phone:any) => <NumberField>
                     <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
-                    <NumberInput placeholder='+628XXXXXXXXXX' type='text' value={phone.number} />
+                    <NumberInput placeholder='+628XXXXXXXXXX' type='text' value={numberValue === null ?  phone.number : numberValue} onChange={(e: { target: { value: any; }; }) => {
+                        update_phone_by_pk({variables:{
+                            pk_columns: {
+                                number: phone.number,
+                                contact_id: id
+                            },
+                            new_phone_number: e.target.value
+                        }})
+                    } }/>
                     </NumberField>)}
+                    <NumberField>
+                    <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
+                    <NumberInput placeholder='+ Add new number' type='text' value={newNumber} onChange={(e: { target: { value: any; }; }) => setNewNumber(e.target.value)}/>
+                    </NumberField>
             </NumberInputField>
             <Save>
                 <SaveBtn onClick={updateContactHandler}>Save</SaveBtn>

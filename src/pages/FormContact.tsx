@@ -5,17 +5,14 @@ import { FaUser } from 'react-icons/fa';
 import { BsFillTelephoneForwardFill } from 'react-icons/bs';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Loading from '../components/Loading';
 import ErrorAlert from '../components/ErrorAlert';
 
-
-function FormContact() {
-
+  function FormContact() {
 
   const {data} = useQuery(GET_CONTACT);
-  const numberRef = useRef<HTMLInputElement | null>(null);
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -25,7 +22,7 @@ function FormContact() {
   const [numberRow, setNumberRow] = useState([
     <InputGroup>
         <BsFillTelephoneForwardFill color='#404040' style={{marginTop: '12px'}} size={20}/>
-        <NumberInput ref={numberRef} name='phone' onChange={(e) => setNumbers([...numbers, {number: e.target.value}])} placeholder='+628XXXXXXXXXX' type='text' />
+        <NumberInput name='phone' onChange={(e) => setNumbers([...numbers, {number: e.target.value}])} placeholder='+628XXXXXXXXXX' type='text' />
     </InputGroup>
   ] as any);
 
@@ -36,8 +33,8 @@ function FormContact() {
     </InputGroup>])
   }
 
-  console.log(numbers)
-
+  console.log(numbers);
+  
   const submitHandler = async () => {
     let unique = false;
     // eslint-disable-next-line array-callback-return
@@ -52,7 +49,7 @@ function FormContact() {
         navigate('/add')
     } else {
         await setPhones(numbers);
-        insert_contact();
+        await insert_contact();
         alert('Success! contact has been added.')
         navigate('/');
     }
@@ -94,7 +91,7 @@ function FormContact() {
                 {numberRow}
             </NumberInputField>
             <NumberInputAction>
-                <AddNumberBtn onClick={addNumberRow}>+ Add More</AddNumberBtn>
+                { numberRow.length !== numbers.length ? '' : <AddNumberBtn onClick={addNumberRow}>+ Add More</AddNumberBtn>}
             </NumberInputAction>
             <Save>
                 <SaveBtn onClick={submitHandler}>Save</SaveBtn>

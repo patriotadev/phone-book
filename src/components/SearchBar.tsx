@@ -16,10 +16,7 @@ const Input = styled.input`
     border: 1px solid lightgrey;
 
     &:focus {
-        // width: 76%;
         outline: none;
-        // border: 1px solid darkgreen;
-        // transform: translateY(-10px);
     }
 `;
 

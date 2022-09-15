@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/phone-book/static/css/main.a240c550.css",
+    "main.js": "/phone-book/static/js/main.fdd7a2f6.js",
+    "static/js/787.6cf1c373.chunk.js": "/phone-book/static/js/787.6cf1c373.chunk.js",
+    "static/media/phonebook.png": "/phone-book/static/media/phonebook.657eff571dce29ab99a2.png",
+    "index.html": "/phone-book/index.html",
+    "main.a240c550.css.map": "/phone-book/static/css/main.a240c550.css.map",
+    "main.fdd7a2f6.js.map": "/phone-book/static/js/main.fdd7a2f6.js.map",
+    "787.6cf1c373.chunk.js.map": "/phone-book/static/js/787.6cf1c373.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a240c550.css",
+    "static/js/main.fdd7a2f6.js"
+  ]
+}
